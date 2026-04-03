@@ -1,1 +1,399 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="We present Kalman-filter Assisted Reinforcement Learner for dynamic object tracking and grasping over eye-on-hand (EoH) systems, significantly expanding such systems' capabilities in challenging, realistic environments. In comparison to the previous state-of-the-art, \ours (1) incorporates a novel six-stage RL curriculum that doubles the system's motion range, thereby greatly enhancing the system's grasping performance, (2) integrates a robust Kalman filter layer between the perception and reinforcement learning (RL) control modules, enabling the system to maintain an uncertain but continuous 6D pose estimate even when the target object temporarily exits the camera's field-of-view or undergoes rapid, unpredictable motion, and (3) introduces mechanisms to allow retries to gracefully recover from unavoidable policy execution failures. Extensive evaluations conducted in both simulation and real-world experiments qualitatively and quantitatively corroborate KARL's advantage over earlier systems, achieving higher grasp success rates and faster robot execution speed.">
+  <meta name="keywords" content="Open-Vocabulary Semantics, Scene Graph, Object Grounding">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KARL: Kalman-Filter Assisted Reinforcement Learner for Dynamic Object Tracking and Grasping</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+      <a class="navbar-item" href="https://Kowndinya2000.github.io">
+      <span class="icon">
+          <i class="fas fa-home"></i>
+      </span>
+      </a>
+
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          More Research
+        </a>
+        <div class="navbar-dropdown">
+          <a class="navbar-item" href="https://Kowndinya2000.github.io">
+            LGMCTS
+          </a>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">KARL: Kalman-Filter Assisted Reinforcement Learner for Dynamic Object Tracking and Grasping</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=tv9b9Y4AAAAJ&hl=en">Kowndinya Boyalakuntla</a>,</span>
+            <span class="author-block">
+              <a href="http://www.abdeslam.net/">Abdeslam Boularias</a>,</span>
+              <span class="author-block">
+              <a href="https://www.cs.rutgers.edu/people/professors/details/jingjin-yu">Jingjin Yu</a>,</span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Rutgers University</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2506.15945"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>IROS'25 Paper</span>
+                </a>
+              </span>
+              <!-- Video Link. -->
+              <!-- <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-youtube"></i>
+                  </span>
+                  <span>Video (Coming Soon!)</span>
+                </a>
+              </span> -->
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/arc-l/karl"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <!-- Dataset Link. -->
+              <!-- <span class="link-block">
+                <a href="https://doi.org/10.6084/m9.figshare.24307072.v1"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="far fa-database"></i>
+                  </span>
+                  <span>DOVE-G</span>
+                  </a>
+                  </span> -->
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- 
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <video id="spotlight" autoplay muted loop playsinline height="100%">
+        <source src="./static/videos/ovsg-spotlight.mp4"
+                type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section> -->
+
+<!-- 
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item item-steve">
+          <video poster="" id="steve" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/bathroom.webm"
+                    >
+          </video>
+        </div>
+        <div class="item item-mask">
+          <video poster="" id="mask" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/kitchen.webm"
+                    >
+          </video>
+        </div>
+        
+        <div class="item item-shiba">
+          <video poster="" id="shiba" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/room3.webm"
+                    >
+          </video>
+        </div>
+        <div class="item item-chair-tp">
+          <video poster="" id="chair-tp" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/kitchenette.webm"
+                    >
+          </video>
+        </div>
+        <div class="item item-fullbody">
+          <video poster="" id="fullbody" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/room2.webm"
+                    >
+          </video>
+        </div>
+        <div class="item item-blueshirt">
+          <video poster="" id="blueshirt" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/room1.webm"
+                    >
+          </video>
+        </div>
+     
+        <div class="item item-coffee">
+          <video poster="" id="coffee" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/hallway.webm"
+                    >
+          </video>
+        </div>
+        <div class="item item-toby">
+          <video poster="" id="toby" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/computer lab.webm"
+                    >
+          </video>
+        </div>
+      </div>
+    </div>
+        <h3 class="title is-3" style="background-position: center;margin-left: 30rem;">
+          <span class="dovsg" style="background-position: center;"> Dataset for Open Vocabulary Entity Grounding</span> (DOVE-G)
+        </h3>
+  </div>
+</section>
+ -->
+<!-- 
+<section class="section"  style="background: #f5f5f5 !important;">
+  <div class="container is-max-desktop" style="background: #f5f5f5 !important;">
+    <div class="columns is-centered has-text-centered" style="background: #f5f5f5 !important;">
+      <div class="column is-four-fifths" style="background: #f5f5f5 !important;">
+        <h2 class="title is-3" style="background: #f5f5f5 !important;">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            We present an Open-Vocabulary 3D Scene Graph (OVSG), a formal framework for grounding 
+            a variety of entities, such as object instances, agents, and regions, with free-form text-based queries. 
+          </p>
+          <p>
+            Unlike conventional semantic-based object localization approaches, our system facilitates context-aware entity localization, allowing for queries such as 
+            <span class="dnerf" style="font-weight: bold;font-size: larger;color: #F86560;">pick up a cup on a kitchen table</span> or 
+            <span class="dnerf" style="font-weight: bold;font-size: larger;color: #F86560;">navigate to a sofa on which someone is sitting</span>.
+            In contrast to existing research on 3D scene graphs, OVSG supports free-form text input 
+            and open-vocabulary querying.             
+          </p>
+          <p>
+            Through a series of comparative experiments using the ScanNet dataset and a self-collected dataset, 
+            we demonstrate that our proposed approach significantly surpasses the performance of previous semantic-based localization techniques. 
+            Moreover, we highlight the practical application of OVSG in real-world robot navigation and manipulation experiments.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">
+          <span class="dovsg">Open Vocabulary 𝟑d Scene Graph</span> (OVSG)
+
+        <h3 class="title is-4">Backbone of our system: OVIR-3D</h3>
+        <img src="./static/images/ovir.png" class="interpolation-image" alt="OVIR-3D">
+        <div class="content has-text-justified">
+          <p>
+            At the core of our system lies <span class="dovsg">Open-Vocabulary 3D Instance Retrieval</span>(OVIR-3D). 
+            Given a 3D scan reconstructed from an RGB-D video and a text query, the proposed method retrieves relevant 3D instances (see examples a-c).
+            Notably, instances that aren't even part of the original annotations can be detected (see examples d-e), such as the cushions on the sofa.
+          </p>
+          
+        </div>
+
+        <h3 class="title is-4">Our Pipeline</h3>
+        <img src="./static/images/ovsg-pipeline.png" class="interpolation-image" alt="OVSG Pipeline">
+        <div class="content has-text-justified">
+          <p>
+            Our proposed pipeline operates on inputs like positional 
+            <span style="color: #EB5B67;font-weight: bolder;">P<sub>u</sub></span>, user <span style="color: #EB5B67;font-weight: bolder;">L<sub>u</sub></span>, 
+            RGBD Scan <span style="color: #EB5B67;font-weight: bolder;">I</span>. 
+          </p>
+          <p>
+            The top section demonstrates the creation of <span style="color: #EB5B67;font-weight: bolder;">G<sub>s</sub></span> , with <span style="color: #EB5B67;font-weight: bolder;">P<sub>u</sub></span> and <span style="color: #EB5B67;font-weight: bolder;">L<sub>u</sub></span> directly channeled into it, while the RGBD Scan <span style="color: #EB5B67;font-weight: bolder;">I</span>  merges with the OVIR-3D system, 
+            leading to position and Detic feature outputs for each item. 
+            The language descriptions undergo encoding processes, including a special Spatial Relationship Encoder for poses. 
+          </p>
+          <p>
+            The bottom section delves into the formation of <span style="color: #EB5B67;font-weight: bolder;">G<sub>q</sub></span>, derived from the example query 
+            <span class="dnerf" style="font-weight: bold;font-size: larger;color: #F86560;">I want to find Tom's bottle in the laboratory.</span> 
+            An LLM breaks down the query into elements which are then feature-encoded to create <span style="color: #EB5B67;font-weight: bolder;">G<sub>q</sub></span>  . 
+          </p>
+          <p>
+            The challenge is matching <span style="color: #EB5B67;font-weight: bolder;">G<sub>q</sub></span>  within <span style="color: #EB5B67;font-weight: bolder;">G<sub>s</sub></span>, using a new proposal and ranking algorithm, where the desired entity is the central node 
+            of the top-ranked candidate.
+          </p>
+        </div>
+
+        <br/>
+
+
+      </div>
+    </div>
+</div>
+</section> -->
+
+
+<!-- <section class="section">
+  <div class="container is-max-desktop">
+
+   <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">
+          Results
+        <h3 class="title is-4">OVSG</h3>
+        <img src="./static/images/ovsg-q.png" class="interpolation-image" alt="OVSG Qualitative">
+        
+        <h3 class="title is-4">ConceptFusion</h3>
+        <img src="./static/images/cfusion-q.png" class="interpolation-image" alt="ConceptFusion Qualitative">
+
+
+      </div>
+    </div>
+</div>
+</section> -->
+
+<!-- <section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">
+          Robot Application
+          </h2>
+          </div>
+          </div>
+          </div>
+          </section> -->
+
+<!-- <section class="hero teaser">
+  <div class="container is-max-desktop">
+    <h3 class="title is-3">
+      Navigation
+      </h3>
+    <div class="hero-body">
+      <video id="teaser" autoplay muted loop playsinline height="100%">
+        <source src="./static/videos/ovsg-nav.mp4"
+                type="video/mp4">
+      </video>
+      <h2 class="subtitle has-text-centered" style="color: #D65E01 !important;;">
+        The ROSMASTER R2 Ackermann Steering Robot, equipped with an Astra Pro Plus Depth Camera, YDLidar TG 2D lidar sensor, IMU, and wheel encoder.
+      </h2>
+      <div class="content has-text-justified">
+        <p>
+          We generated a comprehensive map using an Intel RealSense D455 camera and ORB-SLAM3, which fed into the Open-vocabulary pipeline, and utilized the Robot Operating System (ROS) Navigation stack with the TEB planner for goal-oriented navigation. 
+          For real-world navigation testing with OVSG, a language-based object navigation task was designed, featuring seven objects in a laboratory, each paired with three queries.
+        </p>
+      </div>
+      <h3 class="title is-3">
+        Manipulation
+        </h3>
+      <video id="teaser2" autoplay muted loop playsinline height="100%" style="display: block; margin: auto; background-position: center;">
+        <source src="./static/videos/ovsg-manip.mp4" type="video/mp4">
+    </video>
+    
+      <h2 class="subtitle has-text-centered" style="color: #D65E01 !important;;">
+        Utility of OVSG in real-world manipulation scenarios on a complex pick-and-place task.
+      </h2>
+      <div class="content has-text-justified">
+        <p>
+          The evaluations utilized a Kuka IIWA 14 robot arm with a Robotiq 3-finger adaptive gripper and an Intel Realsense D435 camera for RGB-D captures at 1280 x 720 resolution. The gripper, operating in "Pinch Mode," was used to position the camera above a table before the robot processed RGB-D data and object queries via the OVSG system, subsequently moving towards target objects using the robot's ROS interface. 
+          For real-world testing, a block-building task was introduced, where blocks had to be picked and placed based on natural language queries, challenging due to multiple similar blocks requiring spatial context for identification.
+        </p>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+
+    <h5>If you find our work useful, consider citing:</h5>
+    <h5>KARL</h5>
+      <pre><code>@INPROCEEDINGS{11245879,
+  author={Boyalakuntla, Kowndinya and Boularias, Abdeslam and Yu, Jingjin},
+  booktitle={2025 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)}, 
+  title={KARL: Kalman-Filter Assisted Reinforcement Learner for Dynamic Object Tracking and Grasping}, 
+  year={2025},
+  volume={},
+  number={},
+  pages={2819-2826},
+  keywords={Source coding;Dynamics;Refining;Grasping;Reinforcement learning;Rendering (computer graphics);Object tracking;Kalman filters;Reliability;State estimation},
+  doi={10.1109/IROS60139.2025.11245879}}
+</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column">
+        <div class="content has-text-centered">
+          <p>
+            Website template borrowed from <a href="https://github.com/nerfies/nerfies.github.io">NeRFies</a> made by the amazing <a href="https://keunhong.com/">Keunhong Park</a>. 
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
